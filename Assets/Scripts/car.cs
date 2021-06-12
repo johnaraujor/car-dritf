@@ -9,8 +9,12 @@ public class car : MonoBehaviour
 
     //raycast
 
-    private float moveInput;
-    private float turnInput;
+    public float moveInput2;
+    public float turnInput2;
+
+
+    public float moveInput;
+    public float turnInput;
     private bool isCarGrounded;
 
     public float airDrag;
@@ -23,6 +27,9 @@ public class car : MonoBehaviour
 
     public Rigidbody sphereRB;
 
+    public Animator ani;
+    public bool a;
+
     void Start()
     {
         //detach rigidbody from car
@@ -31,16 +38,50 @@ public class car : MonoBehaviour
 
     void Update()
     {
-        moveInput = Input.GetAxisRaw("Vertical");
-        turnInput = Input.GetAxisRaw("Horizontal");
+
+        if (a == false)
+        {
+            moveInput = Input.GetAxisRaw("Vertical");
+            turnInput = Input.GetAxisRaw("Horizontal");
+
+            //set cars rotation
+            float newRotation = turnInput * turnSpeed * Time.deltaTime * Input.GetAxisRaw("Vertical");
+            transform.Rotate(0, newRotation, 0, Space.World);
+        }
+        else
+        {
+            moveInput = moveInput2;
+            turnInput = turnInput2;
+
+            float newRotation = turnInput * turnSpeed * Time.deltaTime * moveInput2;
+            transform.Rotate(0, newRotation, 0, Space.World);
+        }
+
+       
         moveInput *= moveInput > 0 ? fwdSpeed : revSpeed;
+
 
         //set cars position to sphere
         transform.position = sphereRB.transform.position;
 
-        //set cars rotation
-        float newRotation = turnInput * turnSpeed * Time.deltaTime * Input.GetAxisRaw("Vertical");
-        transform.Rotate(0, newRotation, 0, Space.World);
+
+
+
+        if (turnInput <= 0.1f)
+        {
+            ani.Play("left");
+
+        }
+        if (turnInput >= 0.1f)
+        {
+            ani.Play("right");
+
+        }
+        if (turnInput == 0)
+        {
+            ani.Play("stop");
+
+        }
 
         // raycast ground check
         RaycastHit hit;
@@ -58,6 +99,36 @@ public class car : MonoBehaviour
             sphereRB.drag = airDrag;
         }
     }
+
+    public void left()
+    {
+        turnInput2 = 1;
+    }
+    public void NOleft()
+    {
+        turnInput2 = 0;
+    }
+
+
+    public void right()
+    {
+        turnInput2 = -1;
+    }
+    public void NORright()
+    {
+        turnInput2 = 0;
+    }
+
+
+    public void move()
+    {
+        moveInput2 = 1;
+    }
+    public void NOmove()
+    {
+        moveInput2 = 0;
+    }
+
 
     private void FixedUpdate()
     {
